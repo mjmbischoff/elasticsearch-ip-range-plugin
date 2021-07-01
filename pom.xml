@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+This is a Maven "Project Object Model" (POM) file that describes various details
+about our project and how it should be built.
+See: https://maven.apache.org/
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Basic Maven Project information -->
+    <groupId>dev.bischoff.michael.elastic</groupId>
+    <artifactId>ip-range</artifactId>
+    <version>7.13.2</version>
+    <packaging>jar</packaging>
+
+    <!-- Quick configuration properties -->
+    <properties>
+        <!-- which version of the Elastic Stack to build against/target -->
+        <elastic.version>7.13.2</elastic.version>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <!-- Enable Java 8 -->
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <!-- An elasticsearch plugin is a zip file that contains a couple of extra files.
+                     We use the maven assembly plugin to build this zip.
+                  -->
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/elasticsearch-plugin.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>plugin-zip</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
+    <repositories>
+        <!-- Pull elasticsearch dependencies from the elastic.co maven repository -->
+        <repository>
+            <id>elasticsearch-releases</id>
+            <url>https://artifacts.elastic.co/maven</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <!-- Add a dependency on the elasticsearch and x-pack-core jar files.
+             We set the scope to "provided" because we don't want to ship them with our plugin,
+                elasticsearch will provide the necessary classes at runtime -->
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>${elastic.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+</project>
+
